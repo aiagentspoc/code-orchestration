@@ -15,7 +15,7 @@ Packaging     Schemas &     Template      MCP Stdio     Strands       Procedural
 
 | Phase | Focus Area | TDD Scope | Deliverables | Status |
 | :---: | :--- | :--- | :--- | :---: |
-| **1** | Environment & Dependencies | Environment smoke checks | `pyproject.toml`, directory structure | ⏳ Pending |
+| **1** | Environment & Dependencies | Environment smoke checks | `pyproject.toml`, directory structure | ✅ Complete |
 | **2** | Schemas & Contracts | `tests/test_unit/test_schemas.py` | `src/schemas.py` | ⏳ Pending |
 | **3** | Template Engine & Formatting | `tests/test_unit/test_template_engine.py` | `src/template_engine.py` | ⏳ Pending |
 | **4** | Substrate MCP Stdio Client | `tests/test_integration/test_mcp_client.py` | `src/mcp_client.py` | ⏳ Pending |
@@ -27,6 +27,7 @@ Packaging     Schemas &     Template      MCP Stdio     Strands       Procedural
 ---
 
 ### Phase 1: Environment, Dependencies & Packaging Setup
+* **Status:** ✅ Complete (Completed: 2026-09-10 | Test Suite: 8/8 passed | Artifacts: `.agents/tasks/phase-1/`)
 * **Objective:** Establish reproducible environment packaging and project structure.
 * **Tasks:**
   1. Initialize `pyproject.toml` with dependencies:
@@ -40,7 +41,7 @@ Packaging     Schemas &     Template      MCP Stdio     Strands       Procedural
      * `tests/test_unit/` and `tests/test_integration/`
      * `drafts/` and `logs/`
   3. Verify Python virtual environment via `uv sync` or `pip install -e .`.
-* **Exit Criteria:** `pytest` runs and recognizes test directories with 0 errors.
+* **Exit Criteria:** `pytest` runs and recognizes test directories with 0 errors. (Passed: 8 tests green).
 
 ---
 

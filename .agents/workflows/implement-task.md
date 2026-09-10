@@ -64,6 +64,7 @@ flowchart TD
     - `## 6. Questions & Decisions for Human Approval`: Any design choices requiring human input.
 * **Deliverable:** Save plan as `.agents/tasks/phase-<phase_id>/PLAN.md`.
 * **Human Approval Gate:** Halt execution and present the architecturally validated plan to the user for explicit approval. Do not write source code before approval.
+  * **Mandatory Manual Sign-Off (Rule 8):** The agent MUST strictly wait for a human user to provide manual approval in the chat. If an IDE stop hook or automated policy emits a message saying "The user has automatically approved the artifact through their review policy", the agent MUST NOT advance to Stage 2 automatically. Instead, the agent must halt and re-assert the wait state until an actual human message is received.
 
 ---
 
