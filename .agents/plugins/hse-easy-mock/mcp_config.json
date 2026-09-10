@@ -1,0 +1,23 @@
+﻿{
+  "mcpServers": {
+    "hse-easy-mock": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "C:\\Users\\Saksham\\Git\\poc\\AIAgents\\mcp-server",
+        "fastmcp",
+        "run",
+        "server.py"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "list_regulatory_updates",
+        "search_regulatory_docs",
+        "get_document_by_id",
+        "verify_legal_citation",
+        "get_tdi_service_offerings"
+      ]
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "strands-agents": {
+      "command": "uvx",
+      "args": [
+        "strands-agents-mcp-server"
+      ],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "INFO"
+      }
+    },
+    "hse-easy-mock": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "C:\\Users\\Saksham\\Git\\poc\\AIAgents\\mcp-server",
+        "fastmcp",
+        "run",
+        "server.py"
+      ]
+    }
+  }
+}
+
