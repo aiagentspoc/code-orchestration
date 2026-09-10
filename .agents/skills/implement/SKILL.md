@@ -1,13 +1,13 @@
 ---
 name: implement
 description: >-
-  Select and execute the automated 3-stage implementation workflow for a roadmap milestone or task.
+  Select and execute the automated implementation workflow for a roadmap milestone or task.
   Use whenever the user invokes /implement, /implement <phase_or_task>, or asks to implement a specific phase or task from ROADMAP.md.
 ---
 
 # `/implement` Milestone & Task Implementation Command
 
-This skill triggers the standardized 3-stage automated implementation workflow for the **HSE Easy Code-Orchestration** project, enforcing strict Test-Driven Development (TDD) and architectural integrity.
+This skill triggers the standardized automated implementation workflow for the **HSE Easy Code-Orchestration** project, enforcing strict Test-Driven Development (TDD) and architectural integrity.
 
 ---
 
@@ -43,10 +43,14 @@ If the user invokes `/implement` without specifying an identifier:
 
 When this skill is triggered and a phase/task is confirmed, immediately load and execute the complete workflow defined in:
 
-👉 **[`.agents/workflows/implement_task.md`](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/workflows/implement_task.md)**
+👉 **[`.agents/workflows/implement-task.md`](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/workflows/implement-task.md)**
 
 ### Stage Summary:
-* **Stage 1 (Plan):** Create `.agents/tasks/phase-<id>/PLAN.md` with explicit TDD Red-Green-Refactor strategy. **Halt at Human Approval Gate.**
-* **Stage 2 (Implementation):** Upon approval, autonomously author tests in `tests/` (Red), implement code in `src/` (Green), optimize (Refactor), and author `.agents/tasks/phase-<id>/WALKTHROUGH.md` strictly from terminal `git diff`.
-* **Stage 3 (Review Loop):** Execute parallel architectural and QA audits using [`architect-review`](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/skills/architect-review) and [`code-reviewer`](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/skills/code-reviewer). Apply fixes via `FIXES.md` (up to 3 iterations) and mark the phase `✅ Complete` in [ROADMAP.md](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/ROADMAP.md).
+1. **Stage 1 (Plan & Architectural Check):** Resolve milestone from [ROADMAP.md](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/ROADMAP.md). Invokes the **`architect` agent** with [`@architect-review`](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/skills/architect-review) to audit pure procedural flow ("Code Owns the Flow") and typed contracts (Pydantic v2 schemas) while formulating `.agents/tasks/phase-<id>/PLAN.md`. **Halt at Human Approval Gate.**
+2. **Stage 2 (Iterative TDD Implementation):** Invokes the **`implementation` agent** with full permissions. Executes an incremental Red-Green-Refactor loop per unit/contract (*do not write all tests upfront*), runs `pytest`, and authors diff-driven `WALKTHROUGH.md`.
+3. **Stage 3 (Parallel Review & Fix Loop):** Invokes **`architect`** and **`qa`** agents in parallel to audit boundaries, schemas, telemetry, and test coverage. The `implementation` agent applies fixes via `FIXES.md` (up to 3 iterations).
+4. **Stage 4 (Completion Artifact):** Updates [ROADMAP.md](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/ROADMAP.md) progress tracker to `✅ Complete` and presents milestone completion summary.
+
+
+
 
