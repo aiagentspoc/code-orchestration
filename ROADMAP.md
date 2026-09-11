@@ -16,7 +16,7 @@ Packaging     Schemas &     Template      MCP Stdio     Strands       Procedural
 | Phase | Focus Area | TDD Scope | Deliverables | Status |
 | :---: | :--- | :--- | :--- | :---: |
 | **1** | Environment & Dependencies | Environment smoke checks | `pyproject.toml`, directory structure | ✅ Complete |
-| **2** | Schemas & Contracts | `tests/test_unit/test_schemas.py` | `src/schemas.py` | ⏳ Pending |
+| **2** | Schemas & Contracts | `tests/test_unit/test_schemas.py` | `src/schemas.py` | ✅ Complete |
 | **3** | Template Engine & Formatting | `tests/test_unit/test_template_engine.py` | `src/template_engine.py` | ⏳ Pending |
 | **4** | Substrate MCP Stdio Client | `tests/test_integration/test_mcp_client.py` | `src/mcp_client.py` | ⏳ Pending |
 | **5** | Strands Agent Workers | `tests/test_unit/test_agents.py` | `src/agents.py` | ⏳ Pending |
@@ -46,6 +46,7 @@ Packaging     Schemas &     Template      MCP Stdio     Strands       Procedural
 ---
 
 ### Phase 2: Core Schemas & Data Contracts (TDD Cycle 1)
+* **Status:** ✅ Complete (Completed: 2026-09-11 | Test Suite: 18/18 phase tests passed, 26/26 total suite green | Artifacts: `.agents/tasks/phase-2/`)
 * **Objective:** Implement type-safe Pydantic v2 schemas matching `SPECIFICATIONS.md`.
 * **TDD Tasks:**
   1. **Red:** Write `tests/test_unit/test_schemas.py`:
@@ -54,7 +55,7 @@ Packaging     Schemas &     Template      MCP Stdio     Strands       Procedural
      * Test `ArticleDraft`, `QAReport`, `DraftMetadata`, and `RevisionPayload`.
   2. **Green:** Implement `src/schemas.py` importing/re-exporting models and declaring internal pipeline contracts.
   3. **Refactor:** Ensure clean type annotations and strict validation settings (`extra="ignore"`).
-* **Exit Criteria:** `pytest tests/test_unit/test_schemas.py` passes 100%.
+* **Exit Criteria:** `pytest tests/test_unit/test_schemas.py` passes 100%. (Passed: 12/12 tests green).
 
 ---
 
