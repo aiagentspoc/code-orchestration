@@ -45,11 +45,18 @@ When this skill is triggered and a phase/task is confirmed, immediately load and
 
 👉 **[`.agents/workflows/implement-task.md`](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/workflows/implement-task.md)**
 
+> [!IMPORTANT]
+> **Pre-Flight Requirement:** Always read the [`.agents`](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents) folder (specifications, architecture, designs, templates) and [AGENTS.md](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/AGENTS.md) before starting any job.
+
+> [!CAUTION]
+> **Mandatory Subagent Invocation (No Fallback):** The `architect`, `implementation`, and `qa` agents MUST be spawned via dedicated subagent runners (`agy --agent <name>` or `invoke_subagent` when supported by the host). If the subagent runners fail or cannot spawn the subagents, the workflow MUST FAIL IMMEDIATELY. Fallback execution by the primary agent is strictly prohibited.
+
 ### Stage Summary:
-1. **Stage 1 (Plan & Architectural Check):** Resolve milestone from [ROADMAP.md](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/ROADMAP.md). Invokes the **`architect` agent** with [`@architect-review`](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/skills/architect-review) to audit pure procedural flow ("Code Owns the Flow") and typed contracts (Pydantic v2 schemas) while formulating `.agents/tasks/phase-<id>/PLAN.md`. **Halt at Human Approval Gate (Strict Manual Sign-Off: automated review policies/stop hooks must not bypass this gate).**
-2. **Stage 2 (Iterative TDD Implementation):** Invokes the **`implementation` agent** with full permissions. Executes an incremental Red-Green-Refactor loop per unit/contract (*do not write all tests upfront*), runs `pytest`, and authors diff-driven `WALKTHROUGH.md`.
-3. **Stage 3 (Parallel Review & Fix Loop):** Invokes **`architect`** and **`qa`** agents in parallel to audit boundaries, schemas, telemetry, and test coverage. The `implementation` agent applies fixes via `FIXES.md` (up to 3 iterations).
+1. **Stage 1 (Plan & Architectural Check):** Resolve milestone from [ROADMAP.md](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/ROADMAP.md). Invokes the **`architect` subagent** via dedicated runner with [`@architect-review`](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/skills/architect-review) to audit pure procedural flow ("Code Owns the Flow") and typed contracts (Pydantic v2 schemas) while formulating `.agents/tasks/phase-<id>/PLAN.md`. If invocation fails, workflow fails immediately. **Halt at Human Approval Gate (Strict Manual Sign-Off: automated review policies/stop hooks must not bypass this gate).**
+2. **Stage 2 (Iterative TDD Implementation):** Invokes the **`implementation` subagent** via dedicated runner with full permissions. Executes an incremental Red-Green-Refactor loop per unit/contract (*do not write all tests upfront*), runs `pytest`, and authors diff-driven `WALKTHROUGH.md`. If invocation fails, workflow fails immediately.
+3. **Stage 3 (Parallel Review & Fix Loop):** Invokes **`architect`** and **`qa`** subagents via dedicated runners in parallel to audit boundaries, schemas, telemetry, and test coverage. If invocation fails, workflow fails immediately. The `implementation` subagent applies fixes via `FIXES.md` (up to 3 iterations).
 4. **Stage 4 (Completion Artifact):** Updates [ROADMAP.md](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/ROADMAP.md) progress tracker to `✅ Complete` and presents milestone completion summary.
+
 
 
 

@@ -1,0 +1,5 @@
+{
+  "name": "orchestration-agents",
+  "description": "Specialized subagents for HSE Easy code-orchestrated pipeline: architect, implementation, and qa",
+  "version": "1.0.0"
+}
