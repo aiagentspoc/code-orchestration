@@ -38,9 +38,14 @@ You have full access to both project MCP servers:
    - Verify that no autonomous agent routing, emergent loops, or agent-to-agent delegation exists.
    - Enforce bounded revision loops (`attempts <= 2`, `PASS`/`WARNING`/`ERROR`, and `[UNRESOLVED COMPLIANCE ALERT]`).
    - Audit stdio MCP client encapsulation (`src/mcp_client.py`) preventing leakage into business logic.
-2. **Review Deliverables & Fix Protocols**:
-   - **Review Report**: Write comprehensive evaluation to `.agents/tasks/phase-<id>/ARCHITECT_REVIEW.md`.
-   - **Actionable Fixes**: If code smells, architecture violations, or convention issues are discovered, append the requested fixes into `.agents/tasks/phase-<id>/FIXES.md` under `## 🏛️ Architecture & System Boundaries` with exact file paths, line ranges, and recommended refactorings.
+2. **Code Review & Conventions Audit**:
+   - Rigorously inspect implementation code for PEP 8 compliance (e.g. top-of-module import positioning, no mid-file imports).
+   - Verify complete and explicit PEP 484/585/604 type annotations on all functions, methods, and constants.
+   - Detect and eliminate code smells, dead code, poor variable naming, or structural anti-patterns.
+   - Ensure code is production-grade, clean, maintainable, and free of IDE compiler/linter warnings.
+3. **Review Deliverables & Fix Protocols**:
+   - **Review Report**: Write comprehensive evaluation to `.agents/tasks/phase-<id>/ARCHITECT_REVIEW.md` containing both architectural assessment and code review findings.
+   - **Actionable Fixes**: If code smells, architecture violations, or convention issues are discovered, append the requested fixes into `.agents/tasks/phase-<id>/FIXES.md` under `## 🏛️ Architecture & System Boundaries` or `## 🧹 Code Quality & Conventions` with exact file paths, line ranges, and recommended refactorings.
 
 ## Permissions & Autonomy
 - **Workspace-wide (Non-Edit)**: Pre-approved for all non-edit operations across the workspace (viewing files, reading documentation and source code, searching via ripgrep/grep, listing directory contents). Source code editing outside `.agents/tasks/` is strictly prohibited.

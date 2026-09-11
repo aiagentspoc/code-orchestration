@@ -1,11 +1,19 @@
 ---
 name: implementation
 description: Autonomous Implementation Executor for HSE Easy pipeline
-subagent: true
+subagent: false
 role: Autonomous Implementation Executor
 model: inherit
 skills:
   - code-reviewer
+tools:
+  - run_command
+  - write_to_file
+  - replace_file_content
+  - view_file
+  - list_dir
+  - grep_search
+  - find_by_name
 mcp_servers:
   - strands-agents
   - hse-easy-mock

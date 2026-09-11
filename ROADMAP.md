@@ -17,7 +17,7 @@ Packaging     Schemas &     Template      MCP Stdio     Strands       Procedural
 | :---: | :--- | :--- | :--- | :---: |
 | **1** | Environment & Dependencies | Environment smoke checks | `pyproject.toml`, directory structure | ✅ Complete |
 | **2** | Schemas & Contracts | `tests/test_unit/test_schemas.py` | `src/schemas.py` | ✅ Complete |
-| **3** | Template Engine & Formatting | `tests/test_unit/test_template_engine.py` | `src/template_engine.py` | ⏳ Pending |
+| **3** | Template Engine & Formatting | `tests/test_unit/test_template_engine.py` | `src/template_engine.py` | ✅ Complete |
 | **4** | Substrate MCP Stdio Client | `tests/test_integration/test_mcp_client.py` | `src/mcp_client.py` | ⏳ Pending |
 | **5** | Strands Agent Workers | `tests/test_unit/test_agents.py` | `src/agents.py` | ⏳ Pending |
 | **6** | Procedural Orchestrator & Loop | `tests/test_integration/test_orchestrator.py` | `src/orchestrator.py` | ⏳ Pending |
@@ -60,6 +60,7 @@ Packaging     Schemas &     Template      MCP Stdio     Strands       Procedural
 ---
 
 ### Phase 3: Template Engine & Telemetry Compiler (TDD Cycle 2)
+* **Status:** ✅ Complete (Completed: 2026-09-11 | Test Suite: 11/11 phase tests passed, 37/37 total suite green | Artifacts: `.agents/tasks/phase-3/`)
 * **Objective:** Build the Markdown artifact compiler that renders `.agents/templates/draft.md`.
 * **TDD Tasks:**
   1. **Red:** Write `tests/test_unit/test_template_engine.py`:
@@ -70,7 +71,7 @@ Packaging     Schemas &     Template      MCP Stdio     Strands       Procedural
      * Test formatting of telemetry (wall-clock seconds, tokens, cost).
   2. **Green:** Implement `src/template_engine.py`.
   3. **Refactor:** Optimize regex string replacements and file writing logic.
-* **Exit Criteria:** `pytest tests/test_unit/test_template_engine.py` passes 100%.
+* **Exit Criteria:** `pytest tests/test_unit/test_template_engine.py` passes 100%. (Passed: 11/11 tests green).
 
 ---
 
