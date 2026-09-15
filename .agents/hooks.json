@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python hooks/auto_allow.py",
+            "command": "python .agents/hooks/auto_allow.py",
             "timeout": 10
           }
         ]

@@ -17,7 +17,7 @@ Before initiating this workflow or starting any task, the agent MUST:
 2. **Ensure Automation Hooks are Active:**
    Verify [`.agents/hooks/auto_allow.py`](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/hooks/auto_allow.py) and [`.agents/hooks.json`](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/hooks.json) to bypass redundant approval prompts on safe build/test commands.
 3. **Mandatory Subagent Delegation (Zero Fallback):**
-   The `architect`, `implementation`, and `qa` subagents MUST be invoked via dedicated subagent runners (`agy --agent <name>` or `invoke_subagent` when supported by the host). Fallback execution (simulating subagents inline) is strictly prohibited. If the subagents fail or cannot be spawned for any reason, the workflow MUST FAIL IMMEDIATELY and halt, escalating to the user.
+   The `architect`, `implementation`, and `qa` subagents MUST be invoked via dedicated subagent runners (`agy --agent orchestration-agents:<name>` or `invoke_subagent` when supported by the host). Fallback execution (simulating subagents inline) is strictly prohibited. If the subagents fail or cannot be spawned for any reason, the workflow MUST FAIL IMMEDIATELY and halt, escalating to the user.
 
 ---
 
@@ -50,8 +50,8 @@ flowchart TD
   2. If an identifier is provided: Resolve the target phase from [ROADMAP.md](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/ROADMAP.md), cross-referencing technical requirements in [.agents/docs/ARCHITECTURE.md](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/docs/ARCHITECTURE.md) and [.agents/docs/SPECIFICATIONS.md](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/docs/SPECIFICATIONS.md).
   3. Establish target artifact directory: `.agents/tasks/phase-<phase_id>/` (or `task-<task_id>/`).
 * **Architectural Check & Blueprint Formulation:**
-  - Antigravity invokes the **`architect` subagent** ([`.agents/agents/architect.md`](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/agents/architect.md)) via `invoke_subagent` equipped with [`@architect-review`](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/skills/architect-review/SKILL.md) and access to `strands-agents` and `hse-easy-mock` MCP servers.
-  - **Zero Fallback Failure Gate:** If `invoke_subagent` is unavailable or fails to spawn the `architect` subagent, the workflow MUST FAIL IMMEDIATELY. Primary agent fallback is strictly prohibited. Halt execution and report failure to the user.
+  - Antigravity invokes the **`architect` subagent** ([`.agents/agents/architect.md`](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/agents/architect.md)) via dedicated agent runners (`agy --agent architect` or `invoke_subagent` when supported by the host) equipped with [`@architect-review`](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/skills/architect-review/SKILL.md) and access to `strands-agents` and `hse-easy-mock` MCP servers.
+  - **Zero Fallback Failure Gate:** If the subagent runner fails or cannot spawn the `architect` subagent, the workflow MUST FAIL IMMEDIATELY. Primary agent fallback is strictly prohibited. Halt execution and report failure to the user.
   - The plan is constructed while concurrently performing architectural verification:
     - **Pure Procedural Flow:** Verify adherence to **Rule 1: "Code Owns the Flow"**. Ensure all pipeline control flow, worker sequencing, candidate throttling, and revision loop counters reside in imperative, procedural Python inside `src/orchestrator.py`, completely avoiding autonomous sequencing, open-ended loops, or LLM routing.
     - **Typed Contracts:** Verify adherence to **Rule 2: Strict Adherence to Schemas**. Ensure all inter-agent and substrate payloads strictly match Pydantic v2 schemas defined in [.agents/docs/SPECIFICATIONS.md](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/docs/SPECIFICATIONS.md) (`RegulatoryUpdateSummary`, `RegulatoryDocument`, `CitationVerificationResult`, `TDIServiceOffering`, `ArticleDraft`, `QAReport`, `RevisionPayload`), with zero unstructured dictionaries.
@@ -77,8 +77,8 @@ flowchart TD
 
 ### 2. Stage 2: Iterative TDD Implementation (`implementation` subagent)
 * **Trigger:** Initiated upon receiving explicit human approval of the Stage 1 plan.
-* **Agent Invocation:** Antigravity invokes the **`implementation` subagent** ([`.agents/agents/implementation.md`](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/agents/implementation.md)) via `invoke_subagent` equipped with full, unrestricted permissions to create files, execute terminal commands, run `pytest`, and inspect `git diff`.
-* **Zero Fallback Failure Gate:** If `invoke_subagent` is unavailable or fails to spawn the `implementation` subagent, the workflow MUST FAIL IMMEDIATELY. Primary agent fallback is strictly prohibited. Halt execution and report failure to the user.
+* **Agent Invocation:** Antigravity invokes the **`implementation` subagent** ([`.agents/agents/implementation.md`](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/agents/implementation.md)) via dedicated agent runners (`agy --agent implementation` or `invoke_subagent` when supported by the host) equipped with full, unrestricted permissions to create files, execute terminal commands, run `pytest`, and inspect `git diff`.
+* **Zero Fallback Failure Gate:** If the subagent runner fails or cannot spawn the `implementation` subagent, the workflow MUST FAIL IMMEDIATELY. Primary agent fallback is strictly prohibited. Halt execution and report failure to the user.
 * **Incremental Red-Green-Refactor Cycle (Rule 7):**
   > [!IMPORTANT]
   > **Plan the whole task first, execute in small batches (Incremental TDD).**
@@ -107,7 +107,7 @@ flowchart TD
 ---
 
 ### 3. Stage 3: Parallel Review & Iterative Fix Loop (Max 3 Iterations)
-* **Execution:** Antigravity invokes the **`architect` subagent** and **`qa` subagent** in parallel via dedicated runners (`agy --agent <name>` or `invoke_subagent`):
+* **Execution:** Antigravity invokes the **`architect` subagent** and **`qa` subagent** in parallel via dedicated runners (`agy --agent orchestration-agents:<name>` or `invoke_subagent`):
   * **Zero Fallback Failure Gate:** If the subagent runners fail or cannot spawn either subagent, the workflow MUST FAIL IMMEDIATELY. Primary agent fallback is strictly prohibited. Halt execution and report failure to the user.
   - **Architect Subagent Audit:** Audits implementation against [`architect-review`](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/skills/architect-review/SKILL.md) and [`code-reviewer`](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/skills/code-reviewer/SKILL.md) (verifying "Code Owns the Flow", Strands worker isolation, MCP stdio client boundaries, template decoupling, AND performing a comprehensive code review covering PEP 8, import hygiene, typing precision, and maintainability). Writes evaluation to `.agents/tasks/phase-<phase_id>/ARCHITECT_REVIEW.md`.
   - **QA Subagent Audit:** Audits implementation against [`code-reviewer`](file:///c:/Users/Saksham/Git/poc/AIAgents/code-orchestration/.agents/skills/code-reviewer/SKILL.md) (verifying strict TDD test coverage, Pydantic v2 schema compliance, `AgentResult.metrics.get_summary()` telemetry extraction, zero loose dicts). Writes evaluation to `.agents/tasks/phase-<phase_id>/QA_REVIEW.md`.

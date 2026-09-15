@@ -1,11 +1,10 @@
 ---
 name: implementation
 description: Autonomous Implementation Executor for HSE Easy pipeline
-subagent: false
+subagent: true
+enable_write_tools: true
 role: Autonomous Implementation Executor
 model: inherit
-skills:
-  - code-reviewer
 tools:
   - run_command
   - write_to_file

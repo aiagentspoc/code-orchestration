@@ -2,6 +2,7 @@
 name: qa
 description: Quality Assurance, Verification & TDD Reviewer for HSE Easy pipeline
 subagent: true
+enable_write_tools: true
 role: Quality Assurance, Verification & TDD Reviewer
 model: inherit
 skills:

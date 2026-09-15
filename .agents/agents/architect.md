@@ -2,6 +2,7 @@
 name: architect
 description: Lead Architecture & Code Conventions Reviewer for HSE Easy pipeline
 subagent: true
+enable_write_tools: true
 role: Lead Architecture & Code Conventions Reviewer
 model: inherit
 skills:
