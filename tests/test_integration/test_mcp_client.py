@@ -87,18 +87,34 @@ def test_client_get_tdi_service_offerings():
         assert len(res) > 0
         assert isinstance(res[0], TDIServiceOffering)
 
-def test_client_strands_tool_provider_compatibility():
+def test_scoped_tool_lists_share_one_session():
+    """Three per-agent tool scopes resolve off a single live substrate session."""
     with HSEMockMCPClient() as client:
-        assert hasattr(client, 'load_tools')
-        assert hasattr(client, 'mcp_client')
-        import inspect
-        tools_coro = client.load_tools()
-        if inspect.iscoroutine(tools_coro):
-            import asyncio
-            tools = asyncio.run(tools_coro)
-        else:
-            tools = tools_coro
-        assert len(tools) > 0
+        all_tools = client.list_all_tools()
+        assert {t.tool_name for t in all_tools} == {
+            "list_regulatory_updates",
+            "search_regulatory_docs",
+            "get_document_by_id",
+            "verify_legal_citation",
+            "get_tdi_service_offerings",
+        }
+
+        scout_scope = client.load_scoped_tools(
+            ["list_regulatory_updates", "search_regulatory_docs", "get_document_by_id"]
+        )
+        writer_scope = client.load_scoped_tools(["get_tdi_service_offerings", "get_document_by_id"])
+        qa_scope = client.load_scoped_tools(["verify_legal_citation"])
+
+        assert {t.tool_name for t in scout_scope} == {
+            "list_regulatory_updates",
+            "search_regulatory_docs",
+            "get_document_by_id",
+        }
+        assert {t.tool_name for t in writer_scope} == {"get_tdi_service_offerings", "get_document_by_id"}
+        assert {t.tool_name for t in qa_scope} == {"verify_legal_citation"}
+
+        # The same session still serves unscoped listings afterwards.
+        assert len(client.list_all_tools()) == 5
 
 def test_client_error_handling_nonexistent_doc():
     with HSEMockMCPClient() as client:

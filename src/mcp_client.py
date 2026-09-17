@@ -2,7 +2,9 @@
 
 import json
 import os
+from collections.abc import Sequence
 from strands.tools.mcp import MCPClient
+from strands.tools.mcp.mcp_agent_tool import MCPAgentTool
 from .schemas import (
     RegulatoryUpdateSummary,
     RegulatoryDocument,
@@ -63,9 +65,19 @@ class HSEMockMCPClient:
             raise MCPToolExecutionError(error_msg)
         return json.loads(res["content"][0]["text"])
 
-    def load_tools(self):
+    def list_all_tools(self) -> list[MCPAgentTool]:
+        """Return every substrate tool advertised by the connected server."""
         self._ensure_connected()
-        return self.mcp_client.list_tools_sync()
+        return list(self.mcp_client.list_tools_sync())
+
+    def load_scoped_tools(self, names: Sequence[str]) -> list[MCPAgentTool]:
+        """Return only the named substrate tools, for per-agent tool scoping.
+
+        The filter is applied per listing, so several scopes can be resolved
+        off the one shared stdio session this client owns.
+        """
+        self._ensure_connected()
+        return list(self.mcp_client.list_tools_sync(tool_filters={"allowed": list(names)}))
 
     def list_regulatory_updates(
         self, 

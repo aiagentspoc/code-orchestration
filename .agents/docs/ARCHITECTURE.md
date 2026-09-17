@@ -63,6 +63,9 @@ flowchart TD
 
 ### 3. Component Breakdown & Strands Agent Roles
 
+> [!NOTE]
+> **The "Scoped Tools" column below is superseded by D19** for Scout, Writer and QA-Legal: all three receive every substrate tool. The entries are retained as *declared intent* — what each worker is expected to reach for — and as the scoping argument used in the Phase 8 comparison. ScopeParser remains genuinely tool-free. Role boundaries are enforced by system-prompt non-goals and audited via `AgentTelemetry.tool_invocations`.
+
 | Component | Technology / Model | Role & Responsibilities | Scoped Tools |
 | :--- | :--- | :--- | :--- |
 | **Scope Parser** | Strands `Agent`<br/>`gpt-5-mini` | One-shot natural language extraction of time window, regulatory sources, sector constraints, and optional draft ceiling from raw user prompt. | None (pure extraction) |
@@ -176,4 +179,5 @@ The root `strands` logger is configured to stream debug/info output to `logs/pip
 | **D16** | Verification Harness | Fixture-based integration + unit tests | Live LLM calls on every test run | Fast, deterministic CI runs without consuming live LLM tokens, verifying stdio protocol cleanliness. |
 | **D17** | Observability & Telemetry | Native Strands `AgentResult.metrics` & root logger | Custom manual token estimation / external proxy | Strands natively exposes `inputTokens`, `outputTokens`, `totalTokens`, `latencyMs`, and tool statistics. |
 | **D18** | Revision Interface Contract | Structured Object Passing (`current_draft.model_dump()` & `qa_report.model_dump()`) | Narrative prompt interpolation; File pointer with `read_file` tool | Delivers typed Pydantic objects directly into the context payload without narrative ambiguity or extra tool-hop latency. |
+| **D19** | Worker Tool Access | **Unrestricted substrate access** for Scout, Writer and QA-Legal (all 5 tools); ScopeParser remains tool-free | Per-agent scoped tool bindings (the original §3 "Scoped Tools" column) | Scoping proved to be *under*-provisioning, not discipline: QA-Legal is charged with auditing "every citation **and statutory statement**" (§3), which requires `get_document_by_id` to compare draft claims against `key_obligations` and `penalties_summary` — impossible with `verify_legal_citation` alone. Likewise a Writer that can verify its own citations produces a cleaner first draft and a cheaper run; the bounded revision loop (D9/D10) is a safety net, not a metric to maximise, and it stays verified by the mocked Scenario A/B/C tests (D16) regardless of how often it fires in production. **Consequence:** the role boundary moves from the tool list into the system prompts, which must state each worker's explicit non-goals, and `AgentTelemetry.tool_invocations` becomes the mechanism for detecting role bleed after the fact. The `*_TOOL_NAMES` constants in `src/agents.py` remain as *declared intent* and as the argument that restores scoping for the Phase 8 scoped-vs-unscoped comparison. Supersedes the "Scoped Tools" column of §3 for those three workers. |
 

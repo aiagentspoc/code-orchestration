@@ -47,6 +47,21 @@ Be concrete throughout — cite file paths, line numbers, and existing signature
 
 Audit the implemented code against both skills you loaded. Inspect `git diff` for what actually changed. Cover control-flow integrity, Strands worker boundary isolation, data-contract compliance, MCP subprocess lifecycle, telemetry plumbing, **and** a genuine code review: PEP 8 and import hygiene (zero E402), complete PEP 484/585/604 annotations, dead code, naming, maintainability.
 
+#### Mandatory lint pass
+
+Run `ruff` on every audit and report its findings — this is not optional and not delegated:
+
+```bash
+.venv/Scripts/ruff.exe check src tests --no-cache
+```
+
+Ruff is configured by `[tool.ruff]` in `pyproject.toml`. Split what it reports into two groups and present them separately:
+
+- **In-scope findings** — anything in a file this phase created or modified (`git diff --name-only` plus untracked files). These are **blocking**: append them to `FIXES.md` for the `implementation` subagent to fix within the phase.
+- **Pre-existing debt** — findings in files this phase did not touch. These are **not** blocking and must not be fixed inside the phase. Report them as a counted summary by rule code so the backlog stays visible, and state plainly that they are deferred.
+
+A known backlog of pre-existing findings from phases 2–4 is deferred to a later cleanup milestone. Re-report its current count each time rather than treating it as resolved or as a phase failure. Never run `ruff check --fix` yourself — you have no write access to `src/` or `tests/`.
+
 Write your verdict and findings to `.agents/tasks/phase-<id>/ARCHITECT_REVIEW.md` using the review output format from the architect-review skill.
 
 If you find actionable defects, append them to `.agents/tasks/phase-<id>/FIXES.md` under `## 🏛️ Architecture & System Boundaries` or `## 🧹 Code Quality & Conventions` — exact file paths, line ranges, and the recommended change. Append to that file; never clobber sections another reviewer wrote.
@@ -57,7 +72,7 @@ Your final message is the only thing the orchestrating agent sees.
 
 **Stage 1:** the report *is* the deliverable. Structure it under the four headings above and give the orchestrating agent everything it needs to write a precise plan without re-reading the codebase — real signatures, real constraints, real blockers. Length is justified here; vagueness is not.
 
-**Stage 3:** state your verdict, the path you wrote, whether you opened `FIXES.md` items, and the count and severity of findings. Be specific — "3 findings: 1 blocker (untyped boundary in `src/agents.py:42`), 2 minor" beats "some issues found".
+**Stage 3:** state your verdict, the path you wrote, whether you opened `FIXES.md` items, and the count and severity of findings. Be specific — "3 findings: 1 blocker (untyped boundary in `src/agents.py:42`), 2 minor" beats "some issues found". Always include the ruff result as two numbers: in-scope findings (blocking) and deferred pre-existing debt.
 
 ## Standards
 

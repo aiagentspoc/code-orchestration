@@ -183,6 +183,66 @@ class RevisionPayload(BaseModel):
     qa_audit: QAReport = Field(..., description="The full QAReport containing errors and notes")
 ```
 
+#### 3.3 Scout Triage Models (`src/schemas.py`)
+
+Added in Phase 5. The Scout Agent's structured output. Rule 4 / D3 assign the `max_drafts` ceiling to the orchestrator, so the Scout returns **all** qualifying candidates, ranked; it never truncates.
+
+```python
+class ScoutCandidate(BaseModel):
+    """One triaged regulatory update with its editorial relevance score."""
+    update: RegulatoryUpdateSummary
+    newsworthiness_score: float = Field(..., ge=0.0, le=1.0)
+    rationale: str = Field(..., description="Why this update qualifies for drafting")
+
+class ScoutReport(BaseModel):
+    """Ranked candidate set returned by the Scout Agent."""
+    candidates: List[ScoutCandidate] = Field(default_factory=list)
+```
+
+#### 3.4 Worker Telemetry Envelope (`src/schemas.py`)
+
+Added in Phase 5. Strands exposes run metrics as `AgentResult.metrics.get_summary()`, an untyped `dict[str, Any]`. Rule 2 forbids loose dictionaries across module boundaries, so every worker returns a typed envelope instead: the structured payload plus its telemetry. `src/agents.py` is the only module permitted to read `get_summary()`, and only inside `extract_telemetry()`.
+
+```python
+class ToolInvocation(BaseModel):
+    """Per-tool execution statistics for one agent invocation."""
+    tool_name: str
+    call_count: int = 0
+    success_count: int = 0
+    error_count: int = 0
+    total_time_seconds: float = 0.0
+
+class AgentTelemetry(BaseModel):
+    """Typed projection of AgentResult.metrics.get_summary() for one worker call."""
+    model_id: str = Field(..., description="Model binding per ARCHITECTURE §3; keys the cost rate table")
+    input_tokens: int = 0
+    output_tokens: int = 0
+    total_tokens: int = 0
+    latency_ms: int = 0
+    total_duration_seconds: float = 0.0
+    cycles: int = 0
+    tool_invocations: List[ToolInvocation] = Field(default_factory=list)
+
+T = TypeVar("T", bound=BaseModel)
+
+class WorkerOutput(BaseModel, Generic[T]):
+    """What every Strands worker returns: its structured payload plus telemetry."""
+    payload: T
+    telemetry: AgentTelemetry
+```
+
+**Telemetry source mapping** (Rule 6, D17):
+
+| Field | Source in `metrics.get_summary()` |
+| :--- | :--- |
+| `input_tokens` / `output_tokens` / `total_tokens` | `accumulated_usage.inputTokens` / `.outputTokens` / `.totalTokens` |
+| `latency_ms` | `accumulated_metrics.latencyMs` |
+| `total_duration_seconds` | `total_duration` |
+| `cycles` | `total_cycles` |
+| `tool_invocations` | `tool_usage.<tool_name>.execution_stats` |
+| `model_id` | supplied by the runner from its `src/agents.py` constant |
+
+`tool_invocations` is what makes per-agent tool behaviour auditable — which tools each worker actually reached for, how often, and how often they failed. Under **D19** the substrate tools are no longer scoped per worker, so role boundaries are stated in each system prompt rather than enforced by the tool list; `tool_invocations` is the compensating control that makes role bleed **detectable** after the fact. Phase 6 must surface it in the draft telemetry section, or D19's detection half is inert.
 
 ---
 

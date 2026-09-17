@@ -1,7 +1,7 @@
 """Pydantic v2 data models and internal contracts for HSE Easy pipeline."""
 
 from enum import IntEnum
-from typing import List, Literal, Optional
+from typing import Generic, List, Literal, Optional, TypeVar
 from pydantic import BaseModel, ConfigDict, Field
 
 __all__ = [
@@ -14,6 +14,11 @@ __all__ = [
     "QAReport",
     "DraftMetadata",
     "RevisionPayload",
+    "ScoutCandidate",
+    "ScoutReport",
+    "ToolInvocation",
+    "AgentTelemetry",
+    "WorkerOutput",
     "PipelineExitCode",
 ]
 
@@ -147,6 +152,77 @@ class RevisionPayload(BaseModel):
     attempt: int = Field(..., description="Revision attempt counter (2 or 3)")
     draft: ArticleDraft = Field(..., description="The previous ArticleDraft object to revise")
     qa_audit: QAReport = Field(..., description="The full QAReport containing errors and notes")
+
+
+# ============================================================================
+# Scout Triage Models (SPECIFICATIONS §3.3)
+# ============================================================================
+
+
+class ScoutCandidate(BaseModel):
+    """One triaged regulatory update with its editorial relevance score."""
+
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+
+    update: RegulatoryUpdateSummary
+    newsworthiness_score: float = Field(..., ge=0.0, le=1.0)
+    rationale: str = Field(..., description="Why this update qualifies for drafting")
+
+
+class ScoutReport(BaseModel):
+    """Ranked candidate set returned by the Scout Agent.
+
+    Rule 4 / D3 assign the ``max_drafts`` ceiling to the orchestrator, so this
+    report carries **all** qualifying candidates; the Scout never truncates.
+    """
+
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+
+    candidates: list[ScoutCandidate] = Field(default_factory=list)
+
+
+# ============================================================================
+# Worker Telemetry Envelope (SPECIFICATIONS §3.4)
+# ============================================================================
+
+
+class ToolInvocation(BaseModel):
+    """Per-tool execution statistics for one agent invocation."""
+
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+
+    tool_name: str
+    call_count: int = 0
+    success_count: int = 0
+    error_count: int = 0
+    total_time_seconds: float = 0.0
+
+
+class AgentTelemetry(BaseModel):
+    """Typed projection of ``AgentResult.metrics.get_summary()`` for one worker call."""
+
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+
+    model_id: str = Field(..., description="Model binding per ARCHITECTURE §3; keys the cost rate table")
+    input_tokens: int = 0
+    output_tokens: int = 0
+    total_tokens: int = 0
+    latency_ms: int = 0
+    total_duration_seconds: float = 0.0
+    cycles: int = 0
+    tool_invocations: list[ToolInvocation] = Field(default_factory=list)
+
+
+T = TypeVar("T", bound=BaseModel)
+
+
+class WorkerOutput(BaseModel, Generic[T]):
+    """What every Strands worker returns: its structured payload plus telemetry."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    payload: T
+    telemetry: AgentTelemetry
 
 
 # ============================================================================

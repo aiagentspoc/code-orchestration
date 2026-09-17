@@ -19,7 +19,7 @@ Packaging     Schemas &     Template      MCP Stdio     Strands       Procedural
 | **2** | Schemas & Contracts | `tests/test_unit/test_schemas.py` | `src/schemas.py` | ✅ Complete |
 | **3** | Template Engine & Formatting | `tests/test_unit/test_template_engine.py` | `src/template_engine.py` | ✅ Complete |
 | **4** | Substrate MCP Stdio Client | `tests/test_integration/test_mcp_client.py` | `src/mcp_client.py` | ✅ Complete |
-| **5** | Strands Agent Workers | `tests/test_unit/test_agents.py` | `src/agents.py` | ⏳ Pending |
+| **5** | Strands Agent Workers | `tests/test_unit/test_agents.py` | `src/agents.py` | ✅ Complete |
 | **6** | Procedural Orchestrator & Loop | `tests/test_integration/test_orchestrator.py` | `src/orchestrator.py` | ⏳ Pending |
 | **7** | Human Gate & Publishing CLI | `tests/test_unit/test_publish.py` | `src/publish.py` | ⏳ Pending |
 | **8** | End-to-End Benchmark & Verification | `tests/test_integration/test_e2e.py` | Sample run, telemetry audit | ⏳ Pending |
@@ -92,6 +92,7 @@ Packaging     Schemas &     Template      MCP Stdio     Strands       Procedural
 ---
 
 ### Phase 5: Strands Agent Workers (TDD Cycle 4)
+* **Status:** ✅ Complete (Completed: 2026-09-16 | Test Suite: 49/49 phase tests passed, 98/98 total suite green | Artifacts: `.agents/tasks/phase-5/`)
 * **Objective:** Implement the 4 specialized Strands `Agent` workers.
 * **TDD Tasks:**
   1. **Red:** Write `tests/test_unit/test_agents.py` using mock LLM model fixtures:
@@ -103,7 +104,8 @@ Packaging     Schemas &     Template      MCP Stdio     Strands       Procedural
      * Define system prompts adhering to TDI editorial and legal audit guidelines.
      * Attach tools to Scout (`list_regulatory_updates`, `get_document_by_id`), Writer (`get_tdi_service_offerings`), and QA (`verify_legal_citation`).
   3. **Refactor:** Ensure prompts enforce structured output models.
-* **Exit Criteria:** `pytest tests/test_unit/test_agents.py` passes 100%.
+* **Exit Criteria:** `pytest tests/test_unit/test_agents.py` passes 100%. (Passed: 38/38 tests green; 49 phase tests total across `test_agents.py`, `test_credentials.py` and `test_model_factory.py`; full suite 98/98 green, zero warnings.)
+* **Delivered beyond the stated scope:** `src/credentials.py` (`.env`-backed `CredentialManager`, `SecretStr` keys) and `src/model_factory.py` (the only module importing a concrete model provider), plus `SPECIFICATIONS.md` §3.3-3.4 and Decision Log **D19** — worker tools are unscoped; role boundaries live in the system prompts and are audited via `AgentTelemetry.tool_invocations`.
 
 ---
 
